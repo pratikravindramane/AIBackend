@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../schema/userModel");
-const { generateOTP } = require("../helper/generateToken");
+const { generateOTP,generateToken } = require("../helper/generateToken");
 const Team = require("../schema/teamModel");
 const sgMail = require("@sendgrid/mail");
 
