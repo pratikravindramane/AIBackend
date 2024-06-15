@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const userRoutes = require("./routes/userRouter");
 const leagueRoutes = require("./routes/leagueRoutes");
 const teamRoutes = require("./routes/teamRoutes");
+const predictionRoutes = require("./routes/predictionRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 8081;
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use("/api", userRoutes);
 app.use("/api", leagueRoutes);
 app.use("/api", teamRoutes);
+app.use("/api", predictionRoutes);
 
 app.listen(PORT, () => {
   console.log(

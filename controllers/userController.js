@@ -1,8 +1,9 @@
 const bcrypt = require("bcrypt");
 const User = require("../schema/userModel");
-const { generateOTP,generateToken } = require("../helper/generateToken");
+const { generateOTP, generateToken } = require("../helper/generateToken");
 const Team = require("../schema/teamModel");
 const sgMail = require("@sendgrid/mail");
+const Submission = require("../schema/submissionModel");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -236,8 +237,49 @@ const getFavoriteTeams = async (req, res) => {
   }
 };
 
+const getUserStats = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.user_id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const accuracy =
+      user.total_questions_answered > 0
+        ? (user.correct_answers / user.total_questions_answered) * 100
+        : 0;
+
+    res.status(200).json({
+      points: user.points,
+      total_questions_answered: user.total_questions_answered,
+      accuracy: accuracy.toFixed(2),
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const newStats = async (req, res) => {
+  try {
+    const predictions = await Submission.find({
+      userId: req.params.userId,
+    }).populate("question_id");
+    let total, right;
+    predictions.map((p) => {
+      p.question_id.answers.filter((a) => {
+        if (a._id == p.selected_option) {
+          total += 1;
+          if (a.is_correct == true) right += 1;
+        }
+      });
+    });
+    console.log({ total, right });
+    res.send({ total, right });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
   signUp,
+  getUserStats,
   login,
   getAllUsers,
   forgotPassword,
@@ -247,4 +289,5 @@ module.exports = {
   makeFavoriteTeam,
   getFavoriteTeams,
   unmakeFavoriteTeam,
+  newStats,
 };
