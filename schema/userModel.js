@@ -37,6 +37,9 @@ const UserSchema = new Schema({
     enum: ["google", "facebook"],
   },
   socialId: String,
+  points: { type: Number, default: 0 },
+  total_questions_answered: { type: Number, default: 0 },
+  correct_answers: { type: Number, default: 0 },
 });
 
 const User = mongoose.model("User", UserSchema);
