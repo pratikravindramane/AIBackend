@@ -24,6 +24,9 @@ router.post("/reset-password", (req, res, next) => {
 router.post("/verify-otp", (req, res, next) => {
   userController.verifyOTP(req, res, next);
 });
+router.post("/verifyOTPSignUp", (req, res, next) => {
+  userController.verifyOTPSignUp(req, res, next);
+});
 
 router.post("/logout", (req, res, next) => {
   userController.logout(req, res, next);
