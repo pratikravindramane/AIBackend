@@ -287,10 +287,27 @@ const unmakeFavoriteTeam = async (req, res) => {
   }
 };
 
+// const getFavoriteTeams = async (req, res) => {
+//   const { userId } = req.params;
+//   try {
+//     const user = await User.findById(userId).populate("teamId");
+//     if (!user) {
+//       res.status(404).json({ message: "User not found" });
+//       return;
+//     }
+
+//     const favoriteTeams = user.teamId;
+//     res.json({ favoriteTeams });
+//   } catch (error) {
+//     console.error("Error in getting favorite teams:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+
 const getFavoriteTeams = async (req, res) => {
   const { userId } = req.params;
   try {
-    const user = await User.findById(userId).populate("teamId");
+    const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
@@ -300,10 +317,9 @@ const getFavoriteTeams = async (req, res) => {
     res.json({ favoriteTeams });
   } catch (error) {
     console.error("Error in getting favorite teams:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error",error });
   }
 };
-
 const getUserStats = async (req, res) => {
   try {
     const user = await User.findById(req.params.user_id);
