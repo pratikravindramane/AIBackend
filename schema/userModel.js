@@ -32,6 +32,8 @@ const UserSchema = new Schema({
     type: String,
     default: undefined,
   },
+  otpExpiry: { type: Date },
+  isVerified: { type: Boolean, default: false },
   socialProvider: {
     type: String,
     enum: ["google", "facebook"],

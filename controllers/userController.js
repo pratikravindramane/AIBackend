@@ -9,19 +9,23 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const signUp = async (req, res) => {
   const { username, email, password, socialProvider, socialId } = req.body;
-
   try {
     let user = await User.findOne({ email });
 
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
+    const otp = generateOTP();
+    const otpExpiry = Date.now() + 300000;
+
     if (socialProvider && socialId) {
       user = new User({
         username,
         email,
         socialProvider,
         socialId,
+        otp,
+        otpExpiry,
       });
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -29,13 +33,54 @@ const signUp = async (req, res) => {
         username,
         email,
         password: hashedPassword,
+        otp,
+        otpExpiry,
       });
     }
+
     await user.save();
-    const token = generateToken(user);
-    res.status(201).json({ token, user });
+
+    const msg = {
+      to: email,
+      from: process.env.EMAIL_FROM,
+      subject: "Your OTP Code",
+      text: `Your OTP code is ${otp}`,
+      html: `<strong>Your OTP code is ${otp}</strong>`,
+    };
+
+    await sgMail.send(msg);
+
+    res.status(201).json({ message: "OTP sent to email", userId: user._id });
   } catch (error) {
     console.error("Error in signup:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+const verifyOTPSignUp = async (req, res) => {
+  const { userId, otp } = req.body;
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid user" });
+    }
+
+    if (user.otp !== otp || user.otpExpiry < Date.now()) {
+      return res.status(400).json({ message: "Invalid or expired OTP" });
+    }
+
+    user.otp = null;
+    user.otpExpiry = null;
+    user.isVerified = true;
+
+    await user.save();
+
+    const token = generateToken(user);
+
+    res.status(200).json({ message: "OTP verified", token, user });
+  } catch (error) {
+    console.error("Error in OTP verification:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -257,30 +302,68 @@ const getUserStats = async (req, res) => {
   }
 };
 
+// const newStats = async (req, res) => {
+//   try {
+//     const predictions = await Submission.find({
+//       userId: req.params.userId,
+//     }).populate("question_id");
+//     let total, right;
+//     predictions.map((p) => {
+//       p.question_id.answers.filter((a) => {
+//         if (a._id == p.selected_option) {
+//           total += 1;
+//           if (a.is_correct == true) right += 1;
+//         }
+//       });
+//     });
+//     console.log({ total, right });
+//     res.send({ total, right });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
 const newStats = async (req, res) => {
   try {
-    const predictions = await Submission.find({
-      userId: req.params.userId,
-    }).populate("question_id");
-    let total, right;
-    predictions.map((p) => {
-      p.question_id.answers.filter((a) => {
-        if (a._id == p.selected_option) {
+    // Fetch predictions and populate question details
+    const predictions = await Submission.find({ userId: req.params.userId }).populate("question_id");
+
+    // Initialize counters for total questions and correct answers
+    let total = 0;
+    let right = 0;
+
+    // Iterate over each prediction
+    predictions.forEach((p) => {
+      // Check each answer for the current question
+      p.question_id.answers.forEach((a) => {
+        // Check if the selected option matches the current answer
+        if (a._id.equals(p.selected_option)) {
+          // Increment total count
           total += 1;
-          if (a.is_correct == true) right += 1;
+          // Increment right count if the answer is correct
+          if (a.is_correct) right += 1;
         }
       });
     });
+
+    // Log the results (optional)
     console.log({ total, right });
+
+    // Send the response with total and correct answers count
     res.send({ total, right });
   } catch (error) {
+    // Handle any errors that occur
     res.status(500).json({ message: error.message });
   }
 };
+
+
 module.exports = {
   signUp,
   getUserStats,
   login,
+  verifyOTPSignUp,
   getAllUsers,
   forgotPassword,
   resetPassword,
