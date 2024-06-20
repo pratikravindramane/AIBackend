@@ -209,6 +209,34 @@ const logout = async (req, res) => {
   res.json({ message: "Logout successful" });
 };
 
+// const makeFavoriteTeam = async (req, res) => {
+//   const { userId, teamId } = req.body;
+
+//   try {
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       res.status(404).json({ message: "User not found" });
+//       return;
+//     }
+
+//     const team = await Team.findById(teamId);
+//     if (!team) {
+//       res.status(404).json({ message: "Team not found" });
+//       return;
+//     }
+
+//     if (!user.teamId.includes(teamId)) {
+//       user.teamId.push(teamId);
+//       await user.save();
+//     }
+
+//     res.json({ message: "Favorite team added successfully", user });
+//   } catch (error) {
+//     console.error("Error in making favorite team:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// };
+
 const makeFavoriteTeam = async (req, res) => {
   const { userId, teamId } = req.body;
 
@@ -216,13 +244,7 @@ const makeFavoriteTeam = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ message: "User not found" });
-      return;
-    }
-
-    const team = await Team.findById(teamId);
-    if (!team) {
-      res.status(404).json({ message: "Team not found" });
-      return;
+      return; 
     }
 
     if (!user.teamId.includes(teamId)) {
@@ -233,7 +255,7 @@ const makeFavoriteTeam = async (req, res) => {
     res.json({ message: "Favorite team added successfully", user });
   } catch (error) {
     console.error("Error in making favorite team:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error",error });
   }
 };
 
