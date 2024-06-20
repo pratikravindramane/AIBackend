@@ -6,17 +6,27 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+  // teamId: [
+  //   {
+  //     type: Schema.Types.ObjectId,
+  //     ref: "Team",
+  //   },
+  // ],
+  // leagueId: {
+  //   type: [Schema.Types.ObjectId],
+  //   ref: "League",
+  //   default: [],
+  // },
   teamId: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "Team",
+      type: String,
     },
   ],
-  leagueId: {
-    type: [Schema.Types.ObjectId],
-    ref: "League",
-    default: [],
-  },
+  leagueId: [
+    {
+      type: String,
+    },
+  ],
   email: {
     type: String,
     required: true,
