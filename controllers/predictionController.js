@@ -42,7 +42,7 @@ const getUserPredictionSubmissions = async (req, res) => {
   try {
     const submissions = await Submission.find({
       user_id: req.params.user_id,
-    }).populate("question_id");
+    })
     res.status(200).json(submissions);
   } catch (error) {
     res.status(500).json({ message: error.message });
