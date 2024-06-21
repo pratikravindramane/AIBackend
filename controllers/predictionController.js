@@ -6,31 +6,31 @@ const submitPrediction = async (req, res) => {
   try {
     const { user_id, question_id, selected_option } = req.body;
 
-    const question = await PredictionQuestion.findById(question_id);
-    if (!question)
-      return res.status(404).json({ message: "Question not found" });
+    // const question = await PredictionQuestion.findById(question_id);
+    // if (!question)
+    //   return res.status(404).json({ message: "Question not found" });
 
-    const isCorrect = question.answers.find(
-      (answer) => answer.answer_text === selected_option
-    ).is_correct;
+    // const isCorrect = question.answers.find(
+    //   (answer) => answer.answer_text === selected_option
+    // ).is_correct;
 
     const submission = new Submission({
       user_id,
       question_id,
       selected_option,
-      isCorrect,
+      // isCorrect,
     });
     await submission.save();
 
-    const user = await User.findById(user_id);
-    if (user) {
-      user.total_questions_answered += 1;
-      if (isCorrect) {
-        user.points += 1;
-        user.correct_answers += 1;
-      }
-      await user.save();
-    }
+    // const user = await User.findById(user_id);
+    // if (user) {
+    //   user.total_questions_answered += 1;
+    //   if (isCorrect) {
+    //     user.points += 1;
+    //     user.correct_answers += 1;
+    //   }
+    //   await user.save();
+    // }
 
     res.status(201).json(submission);
   } catch (error) {

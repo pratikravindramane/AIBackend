@@ -6,13 +6,14 @@ const submissionSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  question_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "PredictionQuestion",
-    required: true,
-  },
+  // question_id: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "PredictionQuestion",
+  //   required: true,
+  // },
+  question_id: { type: String, required: true },
   selected_option: { type: String, required: true },
-  is_correct: { type: Boolean, required: true },
+  // is_correct: { type: Boolean, required: true },
 });
 
 const Submission = mongoose.model("Submission", submissionSchema);
