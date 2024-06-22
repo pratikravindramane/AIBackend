@@ -6,7 +6,7 @@ const sgMail = require("@sendgrid/mail");
 const Submission = require("../schema/submissionModel");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
+//hello world
 const signUp = async (req, res) => {
   const { username, email, password, socialProvider, socialId } = req.body;
   try {
