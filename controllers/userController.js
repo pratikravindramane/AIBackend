@@ -4,9 +4,22 @@ const { generateOTP, generateToken } = require("../helper/generateToken");
 const Team = require("../schema/teamModel");
 const sgMail = require("@sendgrid/mail");
 const Submission = require("../schema/submissionModel");
+const { default: axios } = require("axios");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 //hello world
+async function fetchDataFromAPI2() {
+  try {
+    const response = await axios.get(
+      // "https://aibackend-ibgo.onrender.com/api/getallleagues"
+      "https://jsonplaceholder.typicode.com/todos/1"
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data from API 2:", error);
+    // throw error;
+  }
+}
 const signUp = async (req, res) => {
   const { username, email, password, socialProvider, socialId } = req.body;
   try {
@@ -87,7 +100,7 @@ const verifyOTPSignUp = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-
+  console.log(await fetchDataFromAPI2());
   try {
     const user = await User.findOne({ email });
 
@@ -105,7 +118,7 @@ const login = async (req, res) => {
 
     res.json({ token, user });
   } catch (error) {
-    console.error("Error in login:", error);
+    console.error("Error in login:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -244,7 +257,7 @@ const makeFavoriteTeam = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ message: "User not found" });
-      return; 
+      return;
     }
 
     if (!user.teamId.includes(teamId)) {
@@ -255,7 +268,7 @@ const makeFavoriteTeam = async (req, res) => {
     res.json({ message: "Favorite team added successfully", user });
   } catch (error) {
     console.error("Error in making favorite team:", error);
-    res.status(500).json({ message: "Server error",error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 
@@ -317,7 +330,7 @@ const getFavoriteTeams = async (req, res) => {
     res.json({ favoriteTeams });
   } catch (error) {
     console.error("Error in getting favorite teams:", error);
-    res.status(500).json({ message: "Server error",error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 const getUserStats = async (req, res) => {
@@ -361,11 +374,12 @@ const getUserStats = async (req, res) => {
 //   }
 // };
 
-
 const newStats = async (req, res) => {
   try {
     // Fetch predictions and populate question details
-    const predictions = await Submission.find({ userId: req.params.userId }).populate("question_id");
+    const predictions = await Submission.find({
+      userId: req.params.userId,
+    }).populate("question_id");
 
     // Initialize counters for total questions and correct answers
     let total = 0;
@@ -396,6 +410,205 @@ const newStats = async (req, res) => {
   }
 };
 
+const questions = [
+  {
+    _id: "question1",
+    question_text: "Who will WIN?",
+    answers: [
+      { _id: "answer1a", answer_text: "Real Madrid", is_correct: true },
+      { _id: "answer1b", answer_text: "Barcelona", is_correct: false },
+    ],
+    question_closed: true,
+  },
+  {
+    _id: "question2",
+    question_text: "Who will WIN?",
+    answers: [
+      {
+        _id: "answer2a",
+        answer_text: "Manchester United",
+        is_correct: true,
+      },
+      { _id: "answer2b", answer_text: "Liverpool", is_correct: false },
+    ],
+    question_closed: false,
+  },
+  {
+    _id: "question3",
+    question_text: "Who will WIN?",
+    answers: [
+      { _id: "answer3a", answer_text: "Bayern Munich", is_correct: true },
+      {
+        _id: "answer3b",
+        answer_text: "Borussia Dortmund",
+        is_correct: false,
+      },
+    ],
+    question_closed: true,
+  },
+  {
+    _id: "question4",
+    question_text: "Who will WIN?",
+    answers: [
+      { _id: "answer4a", answer_text: "Juventus", is_correct: true },
+      { _id: "answer4b", answer_text: "AC Milan", is_correct: false },
+    ],
+    question_closed: false,
+  },
+  {
+    _id: "question5",
+    question_text: "Who will WIN?",
+    answers: [
+      {
+        _id: "answer5a",
+        answer_text: "Paris Saint-Germain",
+        is_correct: true,
+      },
+      { _id: "answer5b", answer_text: "Chelsea", is_correct: false },
+    ],
+    question_closed: false,
+  },
+];
+// put the cron job here
+const giveAllUserPoints = async (req, res) => {
+  try {
+    const endedQuestions = questions.filter((e) => e.question_closed); // get all ended questions
+    // get all non assigned submissions
+    const nonEndedSubmissions = await Submission.find({
+      points_calculated: false,
+    });
+
+    // get range of day, week, month and year
+    const getRange = (unit) => {
+      const now = new Date();
+      const start = new Date(now);
+      const end = new Date(now);
+
+      if (unit === "day") {
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+      } else if (unit === "week") {
+        start.setDate(now.getDate() - now.getDay());
+        end.setDate(start.getDate() + 6);
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+      } else if (unit === "month") {
+        start.setDate(1);
+        end.setMonth(now.getMonth() + 1);
+        end.setDate(0);
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+      } else if (unit === "year") {
+        start.setMonth(0, 1);
+        end.setMonth(11, 31);
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+      }
+      return { start, end };
+    };
+
+    const ranges = {
+      day: getRange("day"),
+      week: getRange("week"),
+      month: getRange("month"),
+      year: getRange("year"),
+    };
+
+    // Fetch all users to reset their points if needed
+    const users = await User.find();
+
+    // reset all the point of user as per the date type respectivily
+    for (let user of users) {
+      // Check and reset daily points
+      if (user.lastDailyReset < ranges.day.start) {
+        user.daily = 0;
+        user.lastDailyReset = new Date();
+      }
+      // Check and reset weekly points
+      if (user.lastWeeklyReset < ranges.week.start) {
+        user.weekly = 0;
+        user.lastWeeklyReset = new Date();
+      }
+      // Check and reset monthly points
+      if (user.lastMonthlyReset < ranges.month.start) {
+        user.monthly = 0;
+        user.lastMonthlyReset = new Date();
+      }
+      // Check and reset yearly points
+      if (user.lastYearlyReset < ranges.year.start) {
+        user.yearly = 0;
+        user.lastYearlyReset = new Date();
+      }
+      await user.save(); // Save the user with the reset points
+    }
+
+    let testArry = [];
+    // adding points to the submission and assigning that it has calculated
+    for (let submission of nonEndedSubmissions) {
+      // find the endedQuestion which matches the submitted question
+      const endedQuestion = endedQuestions.find(
+        (q) => q._id.toString() === submission.question_id
+      );
+
+      if (endedQuestion) {
+        // get correct answer
+        const correctOption = endedQuestion.answers.find((q) => q.is_correct);
+        const user = await User.findById(submission.user_id);
+
+        // if answer is correct
+        if (submission.selected_option === correctOption) {
+          submission.points_awarded = 10;
+          console.log({ user });
+          user.correct_answers += 1;
+          user.points += 10;
+
+          // check if it fits in day
+          if (
+            submission.createdAt >= ranges.day.start &&
+            submission.createdAt <= ranges.day.end
+          ) {
+            user.daily += 10;
+          }
+
+          // check if it fits in week
+          if (
+            submission.createdAt >= ranges.week.start &&
+            submission.createdAt <= ranges.week.end
+          ) {
+            user.weekly += 10;
+          }
+          // check if it fits in month
+          if (
+            submission.createdAt >= ranges.month.start &&
+            submission.createdAt <= ranges.month.end
+          ) {
+            user.monthly += 10;
+          }
+          // check if it fits in year
+          if (
+            submission.createdAt >= ranges.year.start &&
+            submission.createdAt <= ranges.year.end
+          ) {
+            user.yearly += 10;
+          }
+        } else {
+          submission.points_awarded = 0;
+        }
+
+        // update submission and user
+        submission.points_calculated = true;
+        user.total_questions_answered += 1;
+        await submission.save();
+        await user.save();
+        testUser.push(user);
+      }
+    }
+    res.send({ users, nonEndedSubmissions, testArry });
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
+};
 
 module.exports = {
   signUp,
@@ -411,4 +624,5 @@ module.exports = {
   getFavoriteTeams,
   unmakeFavoriteTeam,
   newStats,
+  giveAllUserPoints,
 };

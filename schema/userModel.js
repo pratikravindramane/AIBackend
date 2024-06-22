@@ -52,6 +52,10 @@ const UserSchema = new Schema({
   points: { type: Number, default: 0 },
   total_questions_answered: { type: Number, default: 0 },
   correct_answers: { type: Number, default: 0 },
+  dailyPoints: { type: Number, default: 0 },
+  weeklyPoints: { type: Number, default: 0 },
+  monthlyPoints: { type: Number, default: 0 },
+  yearlyPoints: { type: Number, default: 0 },
 });
 
 const User = mongoose.model("User", UserSchema);
