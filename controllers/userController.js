@@ -549,7 +549,7 @@ const giveAllUserPoints = async (req, res) => {
       const endedQuestion = endedQuestions.find(
         (q) => q._id.toString() === submission.question_id
       );
-      console.log({endedQuestion});
+      console.log({ endedQuestion });
 
       if (endedQuestion) {
         // get correct answer
@@ -559,9 +559,8 @@ const giveAllUserPoints = async (req, res) => {
 
         // if answer is correct
         if (submission.selected_option === correctOption._id) {
-          
           submission.points_awarded = 10;
-          console.log('entered the correct option');
+          console.log("entered the correct option");
           user.correct_answers += 1;
           user.points += 10;
 
@@ -612,6 +611,54 @@ const giveAllUserPoints = async (req, res) => {
   }
 };
 
+// get leaderboard
+const leaderboard = async (req, res) => {
+  try {
+    const dailyLeaderboard = await User.find({
+      total_questions_answered: { $gt: 0 },
+    })
+      .sort({ dailyPoints: 1 })
+      .select("username dailyPoints")
+      .exec();
+
+    const weeklyLeaderboard = await User.find({
+      total_questions_answered: { $gt: 0 },
+    })
+      .sort({ weeklyPoints: 1 })
+      .select("username weeklyPoints")
+      .exec();
+
+    const monthlyLeaderboard = await User.find({
+      total_questions_answered: { $gt: 0 },
+    })
+      .sort({ monthlyPoints: 1 })
+      .select("username monthlyPoints")
+      .exec();
+
+    const yearlyLeaderboard = await User.find({
+      total_questions_answered: { $gt: 0 },
+    })
+      .sort({ yearlyPoints: 1 })
+      .select("username yearlyPoints")
+      .exec();
+
+    const formatLeaderboard = (leaderboard, pointsField) => {
+      return leaderboard.map((user) => ({
+        username: user.username,
+        [pointsField]: user[pointsField],
+      }));
+    };
+
+    res.json({
+      daily: formatLeaderboard(dailyLeaderboard, "dailyPoints"),
+      weekly: formatLeaderboard(weeklyLeaderboard, "weeklyPoints"),
+      monthly: formatLeaderboard(monthlyLeaderboard, "monthlyPoints"),
+      yearly: formatLeaderboard(yearlyLeaderboard, "yearlyPoints"),
+    });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
 module.exports = {
   signUp,
   getUserStats,
@@ -627,4 +674,5 @@ module.exports = {
   unmakeFavoriteTeam,
   newStats,
   giveAllUserPoints,
+  leaderboard,
 };

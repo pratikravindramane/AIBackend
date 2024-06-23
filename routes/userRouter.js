@@ -48,4 +48,7 @@ router.get("/getFavoriteTeams/:userId", (req, res, next) => {
 router.get("/give-points-to-users", (req, res, next) => {
   userController.giveAllUserPoints(req, res, next);
 });
+router.get("/leaderboard",(req,res,next)=>{
+  userController.leaderboard(req,res,next)
+})
 module.exports = router;
