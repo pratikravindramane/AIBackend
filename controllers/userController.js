@@ -431,7 +431,7 @@ const questions = [
       },
       { _id: "answer2b", answer_text: "Liverpool", is_correct: false },
     ],
-    question_closed: false,
+    question_closed: true,
   },
   {
     _id: "question3",
@@ -549,16 +549,19 @@ const giveAllUserPoints = async (req, res) => {
       const endedQuestion = endedQuestions.find(
         (q) => q._id.toString() === submission.question_id
       );
+      console.log({endedQuestion});
 
       if (endedQuestion) {
         // get correct answer
         const correctOption = endedQuestion.answers.find((q) => q.is_correct);
         const user = await User.findById(submission.user_id);
+        console.log(correctOption);
 
         // if answer is correct
-        if (submission.selected_option === correctOption) {
+        if (submission.selected_option === correctOption._id) {
+          
           submission.points_awarded = 10;
-          console.log({ user });
+          console.log('entered the correct option');
           user.correct_answers += 1;
           user.points += 10;
 
@@ -567,7 +570,7 @@ const giveAllUserPoints = async (req, res) => {
             submission.createdAt >= ranges.day.start &&
             submission.createdAt <= ranges.day.end
           ) {
-            user.daily += 10;
+            user.dailyPoints += 10;
           }
 
           // check if it fits in week
@@ -575,21 +578,21 @@ const giveAllUserPoints = async (req, res) => {
             submission.createdAt >= ranges.week.start &&
             submission.createdAt <= ranges.week.end
           ) {
-            user.weekly += 10;
+            user.weeklyPoints += 10;
           }
           // check if it fits in month
           if (
             submission.createdAt >= ranges.month.start &&
             submission.createdAt <= ranges.month.end
           ) {
-            user.monthly += 10;
+            user.monthlyPoints += 10;
           }
           // check if it fits in year
           if (
             submission.createdAt >= ranges.year.start &&
             submission.createdAt <= ranges.year.end
           ) {
-            user.yearly += 10;
+            user.yearlyPoints += 10;
           }
         } else {
           submission.points_awarded = 0;
@@ -597,10 +600,9 @@ const giveAllUserPoints = async (req, res) => {
 
         // update submission and user
         submission.points_calculated = true;
-        user.total_questions_answered += 1;
         await submission.save();
         await user.save();
-        testUser.push(user);
+        testArry.push(user);
       }
     }
     res.send({ users, nonEndedSubmissions, testArry });

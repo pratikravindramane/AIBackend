@@ -22,7 +22,10 @@ const submitPrediction = async (req, res) => {
     });
     await submission.save();
 
-    // const user = await User.findById(user_id);
+    const user = await User.findById(user_id);
+    user.total_questions_answered += 1;
+    await user.save();
+
     // if (user) {
     //   user.total_questions_answered += 1;
     //   if (isCorrect) {
@@ -42,7 +45,7 @@ const getUserPredictionSubmissions = async (req, res) => {
   try {
     const submissions = await Submission.find({
       user_id: req.params.user_id,
-    })
+    });
     res.status(200).json(submissions);
   } catch (error) {
     res.status(500).json({ message: error.message });
