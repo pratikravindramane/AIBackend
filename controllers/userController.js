@@ -618,34 +618,36 @@ const leaderboard = async (req, res) => {
       total_questions_answered: { $gt: 0 },
     })
       .sort({ dailyPoints: -1 })
-      .select("username dailyPoints")
+      .select("username dailyPoints _id")
       .exec();
 
     const weeklyLeaderboard = await User.find({
       total_questions_answered: { $gt: 0 },
     })
       .sort({ weeklyPoints: -1 })
-      .select("username weeklyPoints")
+      .select("username weeklyPoints _id")
       .exec();
 
     const monthlyLeaderboard = await User.find({
       total_questions_answered: { $gt: 0 },
     })
       .sort({ monthlyPoints: -1 })
-      .select("username monthlyPoints")
+      .select("username monthlyPoints _id")
       .exec();
 
     const yearlyLeaderboard = await User.find({
       total_questions_answered: { $gt: 0 },
     })
       .sort({ yearlyPoints: -1 })
-      .select("username yearlyPoints")
+      .select("username yearlyPoints _id")
       .exec();
 
     const formatLeaderboard = (leaderboard, pointsField) => {
       return leaderboard.map((user) => ({
         username: user.username,
         [pointsField]: user[pointsField],
+        _id:user._id
+
       }));
     };
 
