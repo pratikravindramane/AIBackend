@@ -37,8 +37,7 @@ const signUp = async (req, res) => {
         email,
         socialProvider,
         socialId,
-        otp,
-        otpExpiry,
+        isVerified:true
       });
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -69,7 +68,6 @@ const signUp = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 const verifyOTPSignUp = async (req, res) => {
   const { userId, otp } = req.body;
   try {
@@ -684,5 +682,5 @@ module.exports = {
   newStats,
   giveAllUserPoints,
   leaderboard,
-  getAUser
+  getAUser,
 };
