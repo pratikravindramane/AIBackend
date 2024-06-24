@@ -135,7 +135,7 @@ const getAllUsers = async (req, res) => {
 const getAUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    res.json(user);
+    res.status(200).json(user);
   } catch (error) {
     console.error("Error getting user", error);
     res.status(500).json({ message: "Server error" });
