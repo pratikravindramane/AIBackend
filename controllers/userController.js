@@ -62,7 +62,8 @@ const signUp = async (req, res) => {
 
     await sgMail.send(msg);
 
-    res.status(201).json({ message: "OTP sent to email", userId: user._id });
+
+    res.status(201).json({ message: "OTP sent to email", userId: user._id,user });
   } catch (error) {
     console.error("Error in signup:", error);
     res.status(500).json({ message: "Server error", error: error.message });
