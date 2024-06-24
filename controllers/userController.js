@@ -98,7 +98,6 @@ const verifyOTPSignUp = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  console.log(await fetchDataFromAPI2());
   try {
     const user = await User.findOne({ email });
 
@@ -120,7 +119,23 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+const socialLogin = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
 
+    if (!user) {
+      res.status(400).json({ message: "Invalid credentials" });
+      return;
+    }
+    const token = generateToken(user);
+
+    res.json({ token, user });
+  } catch (error) {
+    console.error("Error in login:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -683,4 +698,6 @@ module.exports = {
   giveAllUserPoints,
   leaderboard,
   getAUser,
+  socialLogin,
+  
 };

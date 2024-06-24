@@ -9,7 +9,9 @@ router.post("/signup", (req, res, next) => {
 router.post("/login", (req, res, next) => {
   userController.login(req, res, next);
 });
-
+router.post("/social/login", (req, res, next) => {
+  userController.socialLogin(req, res, next);
+});
 router.get("/users", (req, res, next) => {
   userController.getAllUsers(req, res, next);
 });
