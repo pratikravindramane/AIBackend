@@ -13,7 +13,9 @@ router.post("/login", (req, res, next) => {
 router.get("/users", (req, res, next) => {
   userController.getAllUsers(req, res, next);
 });
-
+router.get("/user/:id", (req, res, next) => {
+  userController.getAUser(req, res, next);
+});
 router.post("/forgot-password", (req, res, next) => {
   userController.forgotPassword(req, res, next);
 });
@@ -45,10 +47,12 @@ router.post("/makeFavoriteTeam", (req, res, next) => {
 router.get("/getFavoriteTeams/:userId", (req, res, next) => {
   userController.getFavoriteTeams(req, res, next);
 });
+
 router.get("/give-points-to-users", (req, res, next) => {
   userController.giveAllUserPoints(req, res, next);
 });
-router.get("/leaderboard",(req,res,next)=>{
-  userController.leaderboard(req,res,next)
-})
+
+router.get("/leaderboard", (req, res, next) => {
+  userController.leaderboard(req, res, next);
+});
 module.exports = router;

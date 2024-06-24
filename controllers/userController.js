@@ -132,7 +132,15 @@ const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
+const getAUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.json(user);
+  } catch (error) {
+    console.error("Error getting user", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -646,8 +654,7 @@ const leaderboard = async (req, res) => {
       return leaderboard.map((user) => ({
         username: user.username,
         [pointsField]: user[pointsField],
-        _id:user._id
-
+        _id: user._id,
       }));
     };
 
@@ -677,4 +684,5 @@ module.exports = {
   newStats,
   giveAllUserPoints,
   leaderboard,
+  getAUser
 };
