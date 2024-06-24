@@ -617,28 +617,28 @@ const leaderboard = async (req, res) => {
     const dailyLeaderboard = await User.find({
       total_questions_answered: { $gt: 0 },
     })
-      .sort({ dailyPoints: 1 })
+      .sort({ dailyPoints: -1 })
       .select("username dailyPoints")
       .exec();
 
     const weeklyLeaderboard = await User.find({
       total_questions_answered: { $gt: 0 },
     })
-      .sort({ weeklyPoints: 1 })
+      .sort({ weeklyPoints: -1 })
       .select("username weeklyPoints")
       .exec();
 
     const monthlyLeaderboard = await User.find({
       total_questions_answered: { $gt: 0 },
     })
-      .sort({ monthlyPoints: 1 })
+      .sort({ monthlyPoints: -1 })
       .select("username monthlyPoints")
       .exec();
 
     const yearlyLeaderboard = await User.find({
       total_questions_answered: { $gt: 0 },
     })
-      .sort({ yearlyPoints: 1 })
+      .sort({ yearlyPoints: -1 })
       .select("username yearlyPoints")
       .exec();
 
