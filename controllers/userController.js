@@ -37,7 +37,7 @@ const signUp = async (req, res) => {
         email,
         socialProvider,
         socialId,
-        isVerified:true
+        isVerified: true,
       });
     } else {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -62,8 +62,9 @@ const signUp = async (req, res) => {
 
     await sgMail.send(msg);
 
-
-    res.status(201).json({ message: "OTP sent to email", userId: user._id,user });
+    res
+      .status(201)
+      .json({ message: "OTP sent to email", userId: user._id, user });
   } catch (error) {
     console.error("Error in signup:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -491,6 +492,7 @@ const questions = [
     question_closed: false,
   },
 ];
+
 // put the cron job here
 const giveAllUserPoints = async (req, res) => {
   try {
@@ -585,31 +587,28 @@ const giveAllUserPoints = async (req, res) => {
           user.points += 10;
 
           // check if it fits in day
-          if (
-            submission.createdAt >= ranges.day.start &&
-            submission.createdAt <= ranges.day.end
-          ) {
+          if (Date.now() >= ranges.day.start && Date.now() <= ranges.day.end) {
             user.dailyPoints += 10;
           }
 
           // check if it fits in week
           if (
-            submission.createdAt >= ranges.week.start &&
-            submission.createdAt <= ranges.week.end
+            Date.now() >= ranges.week.start &&
+            Date.now() <= ranges.week.end
           ) {
             user.weeklyPoints += 10;
           }
           // check if it fits in month
           if (
-            submission.createdAt >= ranges.month.start &&
-            submission.createdAt <= ranges.month.end
+            Date.now() >= ranges.month.start &&
+            Date.now() <= ranges.month.end
           ) {
             user.monthlyPoints += 10;
           }
           // check if it fits in year
           if (
-            submission.createdAt >= ranges.year.start &&
-            submission.createdAt <= ranges.year.end
+            Date.now() >= ranges.year.start &&
+            Date.now() <= ranges.year.end
           ) {
             user.yearlyPoints += 10;
           }
