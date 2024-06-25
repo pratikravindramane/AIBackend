@@ -494,7 +494,9 @@ const questions = [
 // put the cron job here
 const giveAllUserPoints = async (req, res) => {
   try {
-    const endedQuestions = questions.filter((e) => e.question_closed); // get all ended questions
+    // get all ended questions
+    const endedQuestions = questions.filter((e) => e.question_closed);
+
     // get all non assigned submissions
     const nonEndedSubmissions = await Submission.find({
       points_calculated: false,
@@ -543,22 +545,22 @@ const giveAllUserPoints = async (req, res) => {
     for (let user of users) {
       // Check and reset daily points
       if (user.lastDailyReset < ranges.day.start) {
-        user.daily = 0;
+        user.dailyPoints = 0;
         user.lastDailyReset = new Date();
       }
       // Check and reset weekly points
       if (user.lastWeeklyReset < ranges.week.start) {
-        user.weekly = 0;
+        user.weeklyPoints = 0;
         user.lastWeeklyReset = new Date();
       }
       // Check and reset monthly points
       if (user.lastMonthlyReset < ranges.month.start) {
-        user.monthly = 0;
+        user.monthlyPoints = 0;
         user.lastMonthlyReset = new Date();
       }
       // Check and reset yearly points
       if (user.lastYearlyReset < ranges.year.start) {
-        user.yearly = 0;
+        user.yearlyPoints = 0;
         user.lastYearlyReset = new Date();
       }
       await user.save(); // Save the user with the reset points

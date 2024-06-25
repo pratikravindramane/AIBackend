@@ -56,6 +56,10 @@ const UserSchema = new Schema({
   weeklyPoints: { type: Number, default: 0 },
   monthlyPoints: { type: Number, default: 0 },
   yearlyPoints: { type: Number, default: 0 },
+  lastDailyReset: { type: Date, default: new Date.now() },
+  lastWeeklyReset: { type: Date, default: new Date.now() },
+  lastMonthlyReset: { type: Date, default: new Date.now() },
+  lastYearlyReset: { type: Date, default: new Date.now() },
 });
 
 const User = mongoose.model("User", UserSchema);
