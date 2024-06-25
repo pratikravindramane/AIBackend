@@ -566,25 +566,21 @@ const giveAllUserPoints = async (req, res) => {
       await user.save(); // Save the user with the reset points
     }
 
-    let testArry = [];
     // adding points to the submission and assigning that it has calculated
     for (let submission of nonEndedSubmissions) {
       // find the endedQuestion which matches the submitted question
       const endedQuestion = endedQuestions.find(
         (q) => q._id.toString() === submission.question_id
       );
-      console.log({ endedQuestion });
 
       if (endedQuestion) {
         // get correct answer
         const correctOption = endedQuestion.answers.find((q) => q.is_correct);
         const user = await User.findById(submission.user_id);
-        console.log(correctOption);
 
         // if answer is correct
         if (submission.selected_option === correctOption._id) {
           submission.points_awarded = 10;
-          console.log("entered the correct option");
           user.correct_answers += 1;
           user.points += 10;
 
@@ -625,10 +621,9 @@ const giveAllUserPoints = async (req, res) => {
         submission.points_calculated = true;
         await submission.save();
         await user.save();
-        testArry.push(user);
       }
     }
-    res.send({ users, nonEndedSubmissions, testArry });
+    res.send({ users, nonEndedSubmissions });
   } catch (error) {
     console.log(error);
     res.send(error);
@@ -702,5 +697,4 @@ module.exports = {
   leaderboard,
   getAUser,
   socialLogin,
-  
 };
